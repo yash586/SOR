@@ -1,25 +1,12 @@
 const express = require("express");
-const dotenv = require("dotenv");
-dotenv.config();
-const { sequelize } = require("./config/database");
-const { initModels } = require("./models/index");
+const cors = require("cors");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+app.use(cors());
 
-initModels();
+app.use(express.json());
 
-const startServer = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("MySql Connected");
-    await sequelize.sync();
-    app.listen(PORT, () => {
-      console.log(`Server running on Port: http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.log("DB connection Failed", error);
-  }
-};
+app.use("/sor", authRoutes);
 
-startServer();
+module.exports = app;
