@@ -26,4 +26,26 @@ const registerUser = async ({ firstName, lastName, email, password }) => {
   };
 };
 
-module.exports = { registerUser };
+const loginEmployee = async (email, password) => {
+  const user = await Employee.findOne({ where: { email } });
+  if (!user) {
+    throw new Error(" Invalid User");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error(" Invalid credentials ");
+  }
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET missing");
+  const secret = process.env.JWT_SECRET;
+  const expiresIn = process.env.JWT_EXPIRES_IN ?? "1d";
+
+  const token = jwt.sign({ hashId: user.ID, intId: user.employeeid }, secret, {
+    expiresIn,
+  });
+  return {
+    token,
+  };
+};
+
+module.exports = { registerUser, loginEmployee };

@@ -27,6 +27,7 @@ Category.init(
     },
     active: {
       type: DataTypes.TINYINT,
+      allowNull: false,
     },
   },
   {
