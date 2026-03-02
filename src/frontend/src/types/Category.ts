@@ -1,7 +1,12 @@
 export interface Category {
   id: number;
-  hashId: string;
+  categoryid: string;
   categoryName: string;
   categoryBackGround: string;
   active: boolean;
 }
+
+export type CategoryCreate = Pick<
+  Category,
+  "categoryName" | "categoryBackGround"
+>;

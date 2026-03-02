@@ -1,6 +1,6 @@
 export interface ObservationType {
   id: number;
-  hashId: string;
+  recordId: string;
   title: string;
   categoryid: string;
   employeeid: string;
@@ -8,3 +8,5 @@ export interface ObservationType {
   date: string;
   active: boolean;
 }
+
+export type ObservationCreate = Omit<ObservationType, "id" | "recordId">;
