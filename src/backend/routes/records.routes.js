@@ -15,4 +15,10 @@ router.post(
   recordController.createRecord,
 );
 
+router.delete(
+  "/deleteObservation/:recordId",
+  authMiddleware.authenticateUser,
+  recordController.deleteRecord,
+);
+
 module.exports = router;

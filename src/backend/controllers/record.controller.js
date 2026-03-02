@@ -1,12 +1,13 @@
 const {
   getSorRecords,
   createObservation,
+  deleteObservation,
 } = require("../services/record.service");
 
 async function getListRecords(req, res) {
   try {
     const employeeId = req.user.intId;
-    const sorRecords = await getSorRecords(employeeId);
+    const sorRecords = await getSorRecords(employeeId, req.query.status);
     res.status(200).json({
       message: "Success",
       data: sorRecords,
@@ -29,4 +30,16 @@ async function createRecord(req, res) {
   }
 }
 
-module.exports = { getListRecords, createRecord };
+async function deleteRecord(req, res) {
+  const { recordId } = req.params;
+  console.log(recordId);
+  try {
+    const record = await deleteObservation(recordId);
+    res.status(200).json({
+      message: "Observation deleted",
+      data: record,
+    });
+  } catch (error) {}
+}
+
+module.exports = { getListRecords, createRecord, deleteRecord };

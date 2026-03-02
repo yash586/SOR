@@ -1,10 +1,11 @@
 const Records = require("../models/records.model");
 const Category = require("../models/category.model");
 const Employee = require("../models/employee.model");
+const { getCategory } = require("../services/category.service");
 
-async function getSorRecords(employeeId) {
+async function getSorRecords(employeeId, status) {
   const records = await Records.findAll({
-    where: { employeeid: employeeId },
+    where: { employeeid: employeeId, active: status === "true" ? 1 : 0 },
     include: [
       {
         model: Category,
@@ -38,9 +39,11 @@ async function createObservation(employeeId, body) {
   }
   const [day, month, year] = date.split("/").map(Number);
   const jsDate = new Date(year, month - 1, day);
+  const category = await getCategory(categoryid);
+  console.log(category);
   const observationRecord = await Records.create({
     title,
-    categoryid,
+    categoryid: category,
     location,
     date: jsDate,
     employeeid: employeeId,
@@ -48,4 +51,15 @@ async function createObservation(employeeId, body) {
   });
   return observationRecord.ID;
 }
-module.exports = { getSorRecords, createObservation };
+
+async function deleteObservation(id) {
+  const observation = await Records.update(
+    { active: 0 },
+    { where: { ID: id, active: 1 } },
+  );
+  if (!observation || observation.length === 0) {
+    throw new Error("No Records Found");
+  }
+  return observation;
+}
+module.exports = { getSorRecords, createObservation, deleteObservation };

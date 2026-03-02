@@ -1,4 +1,7 @@
-const { createCategoryRecord } = require("../services/category.service");
+const {
+  createCategoryRecord,
+  listCategories,
+} = require("../services/category.service");
 
 async function createCategory(req, res) {
   try {
@@ -16,4 +19,16 @@ async function createCategory(req, res) {
   }
 }
 
-module.exports = { createCategory };
+async function getCategory(req, res) {
+  try {
+    const category = await listCategories();
+    res.status(200).json({
+      message: "Success",
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { createCategory, getCategory };
