@@ -2,6 +2,7 @@ const {
   getSorRecords,
   createObservation,
   deleteObservation,
+  updateObservation,
 } = require("../services/record.service");
 
 async function getListRecords(req, res) {
@@ -32,7 +33,6 @@ async function createRecord(req, res) {
 
 async function deleteRecord(req, res) {
   const { recordId } = req.params;
-  console.log(recordId);
   try {
     const record = await deleteObservation(recordId);
     res.status(200).json({
@@ -42,4 +42,16 @@ async function deleteRecord(req, res) {
   } catch (error) {}
 }
 
-module.exports = { getListRecords, createRecord, deleteRecord };
+async function updateRecord(req, res) {
+  try {
+    const { recordId } = req.params;
+    const record = await updateObservation(recordId, req.body);
+    res.status(201).json({
+      message: "Observation Updated Successfully",
+      data: record,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+module.exports = { getListRecords, createRecord, deleteRecord, updateRecord };

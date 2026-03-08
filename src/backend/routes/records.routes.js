@@ -21,4 +21,10 @@ router.delete(
   recordController.deleteRecord,
 );
 
+router.patch(
+  "updateObservation/:recordId",
+  authMiddleware.authenticateUser,
+  recordController.updateRecord,
+);
+
 module.exports = router;

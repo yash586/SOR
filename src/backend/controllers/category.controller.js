@@ -1,6 +1,7 @@
 const {
   createCategoryRecord,
   listCategories,
+  categoryDelete,
 } = require("../services/category.service");
 
 async function createCategory(req, res) {
@@ -31,4 +32,15 @@ async function getCategory(req, res) {
   }
 }
 
-module.exports = { createCategory, getCategory };
+async function deleteCategory(req, res) {
+  const { categoryId } = req.params;
+  try {
+    const record = await categoryDelete(categoryId);
+    res.status(200).json({
+      message: "Category deleted",
+      data: record,
+    });
+  } catch (error) {}
+}
+
+module.exports = { createCategory, getCategory, deleteCategory };

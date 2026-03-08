@@ -32,7 +32,6 @@ async function listCategories() {
 }
 
 const getCategory = async (id) => {
-  console.log(id);
   const response = await Category.findOne({
     where: { ID: id, active: 1 },
   });
@@ -42,4 +41,20 @@ const getCategory = async (id) => {
   const { categoryid } = response;
   return categoryid;
 };
-module.exports = { createCategoryRecord, listCategories, getCategory };
+
+const categoryDelete = async (id) => {
+  const category = await Category.update(
+    { active: 0 },
+    { where: { ID: id, active: 1 } },
+  );
+  if (!category || category.length === 0) {
+    throw new Error("No Records Found");
+  }
+  return category;
+};
+module.exports = {
+  createCategoryRecord,
+  listCategories,
+  getCategory,
+  categoryDelete,
+};

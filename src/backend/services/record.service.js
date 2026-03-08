@@ -2,6 +2,7 @@ const Records = require("../models/records.model");
 const Category = require("../models/category.model");
 const Employee = require("../models/employee.model");
 const { getCategory } = require("../services/category.service");
+const { where } = require("sequelize");
 
 async function getSorRecords(employeeId, status) {
   const records = await Records.findAll({
@@ -9,7 +10,7 @@ async function getSorRecords(employeeId, status) {
     include: [
       {
         model: Category,
-        attributes: ["categoryName", "categoryBackGround"],
+        attributes: ["categoryName", "categoryBackGround", "ID"],
       },
     ],
   });
@@ -25,6 +26,7 @@ async function getSorRecords(employeeId, status) {
       ? {
           categoryName: list.Category.categoryName,
           categoryBackground: list.Category.categoryBackGround,
+          categoryid: list.Category.ID,
         }
       : null,
     active: list.active,
@@ -62,4 +64,41 @@ async function deleteObservation(id) {
   }
   return observation;
 }
-module.exports = { getSorRecords, createObservation, deleteObservation };
+
+async function updateObservation(hashId, body) {
+  try {
+    const { title, categoryid, location, date } = body;
+    const [day, month, year] = date.split("/").map(Number);
+    const jsDate = new Date(year, month - 1, day);
+    const category = await getCategory(categoryid);
+
+    const observation = await Records.findOne({
+      where: { ID: hashId, active: 1 },
+    });
+
+    if (!observation) {
+      throw new Error("Observation not found");
+    }
+
+    const observationRecord = await Records.update(
+      {
+        title,
+        categoryid: category,
+        location,
+        date: jsDate,
+      },
+      { where: { ID: hashId, active: 1 } },
+    );
+
+    return observationRecord;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+module.exports = {
+  getSorRecords,
+  createObservation,
+  deleteObservation,
+  updateObservation,
+};
