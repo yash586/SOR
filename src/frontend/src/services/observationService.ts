@@ -5,7 +5,6 @@ export const getObservations = async (status: "active" | "inactive") => {
   const { data } = await axiosInstance.get(
     `/listView?status=${status === "active"}`,
   );
-  console.log(data);
   return data;
 };
 
@@ -33,13 +32,10 @@ export const deleteObservation = async (recordId: string) => {
   }
 };
 
-export const updateObservation = async (
-  hashId: string,
-  payload: ObservationCreate,
-) => {
+export const update = async (recordId: string, payload: ObservationCreate) => {
   try {
     const { data } = await axiosInstance.patch(
-      `/updateObservation/${hashId}`,
+      `/updateObservation/${recordId}`,
       payload,
     );
     return data;

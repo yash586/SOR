@@ -29,7 +29,6 @@ export const AuthContext = createContext<AuthContextType>({
 const authReducer = (state: AuthState, action: AuthAction) => {
   switch (action.type) {
     case "LOGIN":
-      console.log("LOGIN action fired", action.payload);
       localStorage.setItem("token", action.payload.token);
       localStorage.setItem("hashId", action.payload.hashId);
       return {

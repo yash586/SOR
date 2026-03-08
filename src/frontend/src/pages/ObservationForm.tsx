@@ -12,10 +12,6 @@ interface ObservationFormProps{
   observation?: Observation;
 }
 
-const formatDateForInput = (dateString: string): string => {
-  const [day, month, year] = dateString.split("/"); // "20/02/2026"
-  return `${year}-${month}-${day}`; // "2026-02-20" ✅
-};
 const ObservationForm = ({onSubmit, observation} : ObservationFormProps) => {
   const isEditing = !!observation;
   const [title, setTitle] = useState<string>(observation?.title ?? "");
@@ -35,7 +31,7 @@ const ObservationForm = ({onSubmit, observation} : ObservationFormProps) => {
       onSubmit({
         title,
         location,
-        date: formatDateForInput(date),
+        date: date,
         categoryid: selectedCategory?.value ?? "",
         employeeid: localStorage.getItem("token") ?? "",
       });
