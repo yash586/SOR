@@ -22,7 +22,7 @@ router.delete(
 );
 
 router.patch(
-  "updateObservation/:recordId",
+  "/updateObservation/:recordId",
   authMiddleware.authenticateUser,
   recordController.updateRecord,
 );

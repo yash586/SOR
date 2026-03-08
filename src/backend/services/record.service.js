@@ -39,10 +39,9 @@ async function createObservation(employeeId, body) {
   if (!title || !categoryid || !date) {
     throw new Error("Missing Fields");
   }
-  const [day, month, year] = date.split("/").map(Number);
+  const [day, month, year] = date.split("-").map(Number);
   const jsDate = new Date(year, month - 1, day);
   const category = await getCategory(categoryid);
-  console.log(category);
   const observationRecord = await Records.create({
     title,
     categoryid: category,
@@ -68,7 +67,7 @@ async function deleteObservation(id) {
 async function updateObservation(hashId, body) {
   try {
     const { title, categoryid, location, date } = body;
-    const [day, month, year] = date.split("/").map(Number);
+    const [day, month, year] = date.split("-").map(Number);
     const jsDate = new Date(year, month - 1, day);
     const category = await getCategory(categoryid);
 
