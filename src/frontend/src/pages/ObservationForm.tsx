@@ -1,44 +1,50 @@
-import { useEffect, useRef, useState } from "react"; 
-import { createObservation } from "../services/observationService";
+import { useEffect, useMemo, useState } from "react"; 
 import { getCategories } from "../services/categoryService";
 import { Category } from "../types/Category";
 import { useNavigate } from "react-router-dom";
-import Toast from "../components/common/Toast";
 import Select from "react-select";
 import BackGroundTemplate from "../components/common/BackGroundTemplate";
+import { ObservationCreate, Observation } from "../types/Observation";
+import { epochToDate } from "../utils/dateUtils";
 
-const ObservationForm = () => {
-  const title = useRef<HTMLInputElement>(null);
-  const location = useRef<HTMLInputElement>(null);
-  const date = useRef<HTMLInputElement>(null);
+interface ObservationFormProps{
+  onSubmit: (payload: ObservationCreate) => void;
+  observation?: Observation;
+}
+
+const formatDateForInput = (dateString: string): string => {
+  const [day, month, year] = dateString.split("/"); // "20/02/2026"
+  return `${year}-${month}-${day}`; // "2026-02-20" ✅
+};
+const ObservationForm = ({onSubmit, observation} : ObservationFormProps) => {
+  const isEditing = !!observation;
+  const [title, setTitle] = useState<string>(observation?.title ?? "");
+  const [location, setLocation] = useState<string>(observation?.location ?? "");
+  const [date, setDate] = useState<string>(
+  observation?.date ? epochToDate(Number(observation.date)) : "");
+
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(
+    observation ? { value: observation.category.categoryid, label: observation.category.categoryName, background: observation.category.categoryBackGround} : null
+  );
   const navigate = useNavigate();
-  const [toast, setToast] = useState<{message: string; type:"success" | "danger"} | null>(null);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await createObservation({ 
-              title: title.current?.value ?? "", 
-              location: location.current?.value ?? "",
-              date: formatDate(date.current?.value ?? ""),
-              categoryid: selectedCategory?.value ?? "",
-              employeeid: localStorage.getItem("token") ?? "",
-              active: true
-            });
-      setToast({message: response.data.message, type:"success"});
-      setTimeout(() => navigate("/observations"))
+      onSubmit({
+        title,
+        location,
+        date: formatDateForInput(date),
+        categoryid: selectedCategory?.value ?? "",
+        employeeid: localStorage.getItem("token") ?? "",
+      });
     } catch (error: any) {
-      setToast({message: error.message, type:"danger"});
+      console.error(error);
     }
-  }
+  };
 
-  const formatDate = (dateString: string): string => {
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
-  }
-  
+
   useEffect(() => {
     const fetchCategories = async() =>{
         try {
@@ -49,21 +55,30 @@ const ObservationForm = () => {
         }
       };
       fetchCategories();
-    }, [])
+  }, [])
   
-  const options = categories.map((category: Category) => ({
-    value: category.categoryId,
+  const options = useMemo(() => 
+  categories.map((category: Category) => ({
+    value: category.categoryid,
     label: category.categoryName,
     background: category.categoryBackGround,
-  }));
+  })), [categories]);
+
+  useEffect(() => {
+  if (observation && options.length > 0) {
+    const existing = options.find(
+      (opt) => opt.value === observation.category.categoryid
+    );
+    setSelectedCategory(existing ?? null);
+  }
+}, [options]);
   
   return (
     <>
-  {toast && ( <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)}></Toast>)}
-  <div className="container-fluid py-4">
+    <div className="container-fluid py-4">
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="fw-bold mb-0">Safety Observation — New</h2>
+           <h2>{isEditing ? "Safety Observation — Edit" : "Safety Observation — New"}</h2>
           <button className="btn btn-outline-secondary">← Back</button>
         </div>
         {/* Form Card */}
@@ -84,7 +99,8 @@ const ObservationForm = () => {
                     type="text"
                     className="form-control"
                     placeholder="Enter title"
-                    ref={title}
+                     value={title}
+                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
                 <div className="col-md-6">
@@ -93,7 +109,8 @@ const ObservationForm = () => {
                     type="text"
                     className="form-control"
                     placeholder="Enter location"
-                    ref={location}
+                    value={location}
+                     onChange={(e) => setLocation(e.target.value)}
                   />
                 </div>
               </div>
@@ -115,7 +132,8 @@ const ObservationForm = () => {
                 </div>
                 <div className="col-md-6">
                   <label className="form-label fw-bold">Date</label>
-                  <input type="date" className="form-control" ref={date}/>
+                  <input type="date" className="form-control" value={date}
+                     onChange={(e) => setDate(e.target.value)}/>
                 </div>
               </div>
               {/* Submit */}
@@ -128,7 +146,7 @@ const ObservationForm = () => {
                   className="btn text-white"
                   style={{ backgroundColor: "#9A616D" }}
                 >
-                  Submit
+                  {isEditing ? "Update" : "Submit"}
                 </button>
               </div>
             </form>

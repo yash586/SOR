@@ -32,3 +32,20 @@ export const deleteObservation = async (recordId: string) => {
     );
   }
 };
+
+export const updateObservation = async (
+  hashId: string,
+  payload: ObservationCreate,
+) => {
+  try {
+    const { data } = await axiosInstance.patch(
+      `/updateObservation/${hashId}`,
+      payload,
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to update Observation",
+    );
+  }
+};

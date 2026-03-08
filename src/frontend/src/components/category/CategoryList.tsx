@@ -5,9 +5,10 @@ interface CategoryListProps{
   category: CategoryType[];
   isLoading: boolean;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteCategory: (id: string) => void;
 }
 
-const CategoryList = ({category, isLoading, setShowModal} : CategoryListProps) => {
+const CategoryList = ({category, isLoading, setShowModal, deleteCategory} : CategoryListProps) => {
   return (
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -35,7 +36,7 @@ const CategoryList = ({category, isLoading, setShowModal} : CategoryListProps) =
                 <div className="card-body p-0">
                   <ul className="list-group list-group-flush">
                     {category.map((cat) => (
-                      <CategoryCard key={cat.categoryid} category={cat}/>
+                      <CategoryCard key={cat.categoryid} category={cat} deleteCategory={deleteCategory}/>
                     ))}
                   </ul>
                 </div>

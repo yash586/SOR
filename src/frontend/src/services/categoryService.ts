@@ -16,3 +16,16 @@ export const createCategory = async (payload: CategoryCreate) => {
     );
   }
 };
+
+export const categoryDelete = async (id: string) => {
+  try {
+    const { data } = await axiosInstance.delete(
+      `/category/deleteCategory/${id}`,
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed Deleting Category",
+    );
+  }
+};

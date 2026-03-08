@@ -10,7 +10,8 @@ function App() {
   const Register = lazy(() => import("./pages/Register"));
   const Dashboard = lazy(() => import("./pages/Dashboard"));
   const Observation = lazy(() => import("./pages/Observations"));
-  const ObservationForm = lazy(() => import("./pages/ObservationForm"));
+  const CreateObservation = lazy(() => import("./components/observation/ObservationCreate"));
+  const EditObservation = lazy(() => import("./components/observation/ObservationEdit"));
   const Category = lazy(() => import("./pages/admin/Category"));
 
   return (
@@ -36,7 +37,14 @@ function App() {
           <Route path="/observations/create" element={
             <ProtectedRoute>
               <Layout>
-                <ObservationForm />
+                <CreateObservation />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/observations/edit/:hashId" element={
+            <ProtectedRoute>
+              <Layout>
+                <EditObservation />
               </Layout>
             </ProtectedRoute>
           } />

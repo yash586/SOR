@@ -1,7 +1,7 @@
 import CategoryList from "../../components/category/CategoryList";
 import { useEffect, useState  } from "react";
 import { CategoryCreate, Category as CategoryType } from "../../types/Category";
-import { getCategories, createCategory } from "../../services/categoryService";
+import { getCategories, createCategory, categoryDelete } from "../../services/categoryService";
 import CategoryForm from "./CategoryForm";
 
 const Category = () => {
@@ -37,9 +37,18 @@ const Category = () => {
     }
   };
 
+  const deleteCategory = async(categoryid: string) => {
+    try {
+      await categoryDelete(categoryid);
+      setCategory(prev => prev.filter((obs) => obs.categoryid !== categoryid))
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return(
     <>
-    <CategoryList category={category} isLoading={isLoading} setShowModal={setShowModal}></CategoryList>
+    <CategoryList category={category} isLoading={isLoading} setShowModal={setShowModal} deleteCategory={deleteCategory}></CategoryList>
 
     <CategoryForm
         show={showModal}
