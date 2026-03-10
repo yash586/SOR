@@ -37,6 +37,9 @@ Records.init(
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    filePath: {
+      type: DataTypes.STRING,
+    },
     active: {
       type: DataTypes.TINYINT,
       allowNull: false,

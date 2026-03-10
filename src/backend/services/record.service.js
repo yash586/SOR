@@ -30,12 +30,13 @@ async function getSorRecords(employeeId, status) {
         }
       : null,
     active: list.active,
+    fileUrl: list.filePath,
   }));
   return result;
 }
 
 async function createObservation(employeeId, body) {
-  const { title, categoryid, location, date } = body;
+  const { title, categoryid, location, date, fileUrl } = body;
   if (!title || !categoryid || !date) {
     throw new Error("Missing Fields");
   }
@@ -49,6 +50,7 @@ async function createObservation(employeeId, body) {
     date: jsDate,
     employeeid: employeeId,
     active: 1,
+    filePath: fileUrl ?? null,
   });
   return observationRecord.ID;
 }

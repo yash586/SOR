@@ -4,6 +4,31 @@ const {
   deleteObservation,
   updateObservation,
 } = require("../services/record.service");
+const { generatePreSignedUrl } = require("../services/s3.service");
+
+async function fileUpload(req, res) {
+  try {
+    const { fileName, fileType } = req.query;
+    if (!fileName || !fileType) {
+      return res.status(400).json({
+        message: "Filename and filetype are required",
+      });
+    }
+
+    const { presignedUrl, fileUrl } = await generatePreSignedUrl(
+      fileName,
+      fileType,
+    );
+    return res.json({
+      message: "Presigned Url generated",
+      data: { presignedUrl, fileUrl },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
 
 async function getListRecords(req, res) {
   try {
@@ -54,4 +79,10 @@ async function updateRecord(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
-module.exports = { getListRecords, createRecord, deleteRecord, updateRecord };
+module.exports = {
+  getListRecords,
+  createRecord,
+  deleteRecord,
+  updateRecord,
+  fileUpload,
+};
