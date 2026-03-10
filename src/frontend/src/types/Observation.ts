@@ -9,6 +9,7 @@ export interface ObservationType {
   location: string;
   date: number | string;
   active: boolean;
+  fileUrl: string | null;
 }
 
 export type ObservationCreate = Omit<
@@ -29,4 +30,5 @@ export interface Observation {
   location: string;
   date: number | string;
   active: boolean;
+  fileUrl: string;
 }

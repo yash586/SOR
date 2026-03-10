@@ -6,6 +6,7 @@ import Select from "react-select";
 import BackGroundTemplate from "../components/common/BackGroundTemplate";
 import { ObservationCreate, Observation } from "../types/Observation";
 import { epochToDate } from "../utils/dateUtils";
+import { getUploadUrl, uploadToS3 } from "../services/observationService";
 
 interface ObservationFormProps{
   onSubmit: (payload: ObservationCreate) => void;
@@ -23,17 +24,26 @@ const ObservationForm = ({onSubmit, observation} : ObservationFormProps) => {
   const [selectedCategory, setSelectedCategory] = useState<any>(
     observation ? { value: observation.category.categoryid, label: observation.category.categoryName, background: observation.category.categoryBackGround} : null
   );
+  const [file, setFile] = useState<File | null>(null);
+
   const navigate = useNavigate();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let fileUrl: string|null = null;
+      if(file){
+        const { presignedUrl, fileUrl: s3Url} = await getUploadUrl(file.name, file.type);
+        await uploadToS3(presignedUrl, file);
+        fileUrl = s3Url;
+      }
       onSubmit({
         title,
         location,
         date: date,
         categoryid: selectedCategory?.value ?? "",
         employeeid: localStorage.getItem("token") ?? "",
+        fileUrl,
       });
     } catch (error: any) {
       console.error(error);
@@ -130,6 +140,17 @@ const ObservationForm = ({onSubmit, observation} : ObservationFormProps) => {
                   <label className="form-label fw-bold">Date</label>
                   <input type="date" className="form-control" value={date}
                      onChange={(e) => setDate(e.target.value)}/>
+                </div>
+              </div>
+              <div className="row mb-4">
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Attachment</label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  />
                 </div>
               </div>
               {/* Submit */}

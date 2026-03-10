@@ -45,3 +45,23 @@ export const update = async (recordId: string, payload: ObservationCreate) => {
     );
   }
 };
+
+export const getUploadUrl = async (
+  fileName: string,
+  fileType: string,
+): Promise<{ presignedUrl: string; fileUrl: string }> => {
+  const { data } = await axiosInstance.get("/getFileUploadUrl", {
+    params: { fileName, fileType },
+  });
+  return data.data;
+};
+
+export const uploadToS3 = async (presignedUrl: string, file: File) => {
+  await fetch(presignedUrl, {
+    method: "PUT",
+    body: file,
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
+};
